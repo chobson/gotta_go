@@ -1,0 +1,10 @@
+<% @restrooms.each do |restroom| %>
+  <div class="jumbotron">
+    <h1><%= restroom.name %></h1>
+    <% if restroom.available? %>
+      <p>Go Go Go!</p>
+    <% else %>
+      <p>Better hold it!</p>
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Sensor:</strong>
+  <%= @activity.sensor_id %>
+</p>
+
+<p>
+  <strong>Start:</strong>
+  <%= @activity.start %>
+</p>
+
+<p>
+  <strong>Stop:</strong>
+  <%= @activity.stop %>
+</p>
+
+<%= link_to 'Edit', edit_activity_path(@activity) %> |
+<%= link_to 'Back', activities_path %>
