@@ -58,8 +58,25 @@ dhcpTimeout     = 60L * 1000L, // Max time to wait for address from DHCP
 connectTimeout  = 15L * 1000L, // Max time to wait for server connection
 responseTimeout = 15L * 1000L; // Max time to wait for data from server
 
+// Sensor information
+#define OCCUPIED  "1"
+#define AVAILABLE "0"
+// tokens
+#define photocell  "photocell"
+#define pir        "pir"
+#define ir         "ir"
+#define sonar      "sonar"
+// states, true = occupied
+boolean photocellState = false;
+boolean pirState = false;
+boolean irState = false;
+boolean sonarState = false;
+
+int pirPin = 2;
+
 void setup(void)
 {
+  pinMode(pirPin, INPUT);     // declare sensor as input
   uint32_t t;
   Serial.begin(115200);
   Serial.print(F("Hello! Initializing CC3000..."));
@@ -79,18 +96,54 @@ void setup(void)
 
 void loop(void)
 {
-  sendStatus("123", "1");
-  sendStatus("abc", "0");
-  delay(15000);
-  sendStatus("123", "0");
-  sendStatus("abc", "1");
-  delay(15000);
+  
+  boolean reading = readPhotocell();
+  if (reading != photocellState) {
+    if (reading == true) {
+      sendStatus(photocell, OCCUPIED);
+    } else {
+      sendStatus(photocell, AVAILABLE);
+    }
+    photocellState = reading;
+  }
+  
+  reading = readPIR();
+  if (reading != pirState) {
+    if (reading == true) {
+      sendStatus(pir, OCCUPIED);
+    } else {
+      sendStatus(pir, AVAILABLE);
+    }
+    pirState = reading;
+  }
+  
+  reading = readIR();
+  if (reading != irState) {
+    if (reading == true) {
+      sendStatus(ir, OCCUPIED);
+    } else {
+      sendStatus(ir, AVAILABLE);
+    }
+    irState = reading;
+  }
+  
+  reading = readSonar();
+  if (reading != sonarState) {
+    if (reading == true) {
+      sendStatus(sonar, OCCUPIED);
+    } else {
+      sendStatus(sonar, AVAILABLE);
+    }
+    sonarState = reading;
+  }
+
+  delay(5000);
 }
 
 void sendStatus(char *sensor, char *sensor_status) {
   ip = 0;
   // Try looking up the website's IP address
-  Serial.print(host); 
+  Serial.print(host);
   Serial.print(F(" -> "));
   while (ip == 0) {
     if (! cc3000.getHostByName(host, &ip)) {
@@ -138,6 +191,70 @@ void sendStatus(char *sensor, char *sensor_status) {
   } 
   else { // Couldn't contact server
     Serial.println(F("failed"));
+  }
+}
+
+// Read sensors
+
+boolean readPhotocell() {
+  int photocellPin = 0;
+  int photocellReading = 0;
+  for (int i=0; i<8; i++) {
+    photocellReading += analogRead(photocellPin);  
+    delay(50);
+  }
+  photocellReading /= 8;
+  
+  if (photocellReading < 700) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+boolean readPIR() {
+  int pirReading = 0;
+  pirReading = digitalRead(pirPin);
+  
+  if (pirReading == HIGH) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+boolean readIR() {
+  int irPin = 1;
+  int irReading = 0;
+  for (int i=0; i<8; i++) {
+    irReading += analogRead(irPin);  
+    delay(50);
+  }
+  irReading /= 8;
+  float voltage = irReading * (5.0 / 1023.0);
+  
+  if (voltage > 0.85) { // within 12 inches
+    return true;
+  } else {
+    return false;
+  }
+}
+
+boolean readSonar() {
+  int sonarPin = 2;
+  int sonarReading;
+  sonarReading = 0;
+  for (int i=0; i<8; i++) {
+    sonarReading += analogRead(sonarPin);
+    delay(50);
+  }  
+  sonarReading /= 8;
+  sonarReading /= 2.54;
+  
+  if (sonarReading < 12) {
+    return true;
+  } else {
+    return false;
   }
 }
 
