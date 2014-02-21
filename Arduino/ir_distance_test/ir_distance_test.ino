@@ -12,7 +12,12 @@ void setup(void) {
 }
  
 void loop(void) {
-  irReading = analogRead(irPin);  
+  irReading = 0;
+  for (int i=0; i<8; i++) {
+    irReading += analogRead(irPin);  
+    delay(50);
+  }
+  irReading /= 8;
  
   Serial.print("IR Distance reading = ");
   float voltage = irReading * (5.0 / 1023.0);

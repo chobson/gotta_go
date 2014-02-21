@@ -1,0 +1,5 @@
+/gotta_go_rails/log/
+/gotta_go_rails/coverage/
+/gotta_go_rails/tmp/
+/gotta_go_rails/db/*.sqlite3
+*.DS_Store
