@@ -37,7 +37,7 @@ SPI_CLOCK_DIVIDER); // you can change this clock speed
 // What page to grab!
 #define host      "HOST"
 #define port      3005
-#define endpoint  "/sensors/123/report"
+#define endpoint  "/sensor_report"
 const char PROGMEM agent[] = "Arduino-GottaGo";
 
 // Similar to F(), but for PROGMEM string pointers rather than literals
@@ -79,13 +79,15 @@ void setup(void)
 
 void loop(void)
 {
-  sendStatus("1");
+  sendStatus("123", "1");
+  sendStatus("abc", "0");
   delay(15000);
-  sendStatus("0");
+  sendStatus("123", "0");
+  sendStatus("abc", "1");
   delay(15000);
 }
 
-void sendStatus(char *sensor_status) {
+void sendStatus(char *sensor, char *sensor_status) {
   ip = 0;
   // Try looking up the website's IP address
   Serial.print(host); 
@@ -106,7 +108,6 @@ void sendStatus(char *sensor_status) {
     // Unlike the hash prep, parameters in the HTTP request don't require sorting.
     client.fastrprint(F("POST "));
     client.fastrprint(endpoint);
-    // TODO: split endpoint up and insert token
     client.fastrprint(F(" HTTP/1.1\r\nHost: "));
     client.fastrprint(host);
     client.fastrprint(F("\r\nUser-Agent: "));
@@ -114,9 +115,12 @@ void sendStatus(char *sensor_status) {
     client.fastrprint(F("\r\nConnection: close\r\n"
       "Content-Type: application/x-www-form-urlencoded;charset=UTF-8\r\n"
       "Content-Length: "));
-    // 7 => "status="
-    client.print(7 + encodedLength(sensor_status));
-    client.fastrprint(F("\r\n\r\nstatus="));
+    // 6 => "token="
+    // 8 => "&status="
+    client.print(14 + encodedLength(sensor) + encodedLength(sensor_status));
+    client.fastrprint(F("\r\n\r\ntoken="));
+    urlEncode(client, sensor, false, false);
+    client.fastrprint(F("&status="));
     urlEncode(client, sensor_status, false, false);
 
     Serial.print(F("OK\r\nAwaiting response..."));
