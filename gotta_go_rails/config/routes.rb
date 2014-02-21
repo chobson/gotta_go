@@ -1,4 +1,5 @@
 GottaGoRails::Application.routes.draw do
+  post 'sensors/:token/report' => 'sensors#report'
   resources :activities
 
   resources :sensors

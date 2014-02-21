@@ -8,4 +8,18 @@ class Sensor < ActiveRecord::Base
   validates :active, presence: true
 
   default_scope { order(:active) }
+
+  def occupied
+    if self.activities.active.size == 0
+      self.activities.create!({start: Time.now})
+    end
+  end
+
+  def available
+    if self.activities.active.size == 1
+      activity = self.activities.active.first
+      activity.stop = Time.now
+      activity.save
+    end
+  end
 end

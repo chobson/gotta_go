@@ -1,6 +1,17 @@
 class SensorsController < ApplicationController
   before_action :set_sensor, only: [:show, :edit, :update, :destroy]
 
+  def report
+    sensor = Sensor.where(token: params[:token]).first
+    status = params[:status]
+    if status == "1"
+      sensor.occupied
+    else
+      sensor.available
+    end
+    render text: sensor.inspect
+  end
+
   # GET /sensors
   # GET /sensors.json
   def index
@@ -69,6 +80,6 @@ class SensorsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def sensor_params
-      params.require(:sensor).permit(:name, :token, :restroom_id)
+      params.require(:sensor).permit(:name, :token, :restroom_id, :status)
     end
 end
