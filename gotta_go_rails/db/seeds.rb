@@ -19,3 +19,6 @@ ir_restroom.sensors.create!({name: "IR Sensor", token: "ir"})
 
 sonar_restroom = Restroom.create!({name: "Sonar Restroom"})
 sonar_restroom.sensors.create!({name: "Sonar Sensor", token: "sonar"})
+
+magnetic_restroom = Restroom.create!({name: "Magnetic Restroom"})
+magnetic_restroom.sensors.create!({name: "Magnetic Sensor", token: "magnetic"})
