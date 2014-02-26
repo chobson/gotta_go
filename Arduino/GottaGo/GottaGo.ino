@@ -66,11 +66,13 @@ responseTimeout = 15L * 1000L; // Max time to wait for data from server
 #define pir        "pir"
 #define ir         "ir"
 #define sonar      "sonar"
+#define magnetic   "magnetic"
 // states, true = occupied
 boolean photocellState = false;
 boolean pirState = false;
 boolean irState = false;
 boolean sonarState = false;
+boolean magneticState = false;
 
 int pirPin = 2;
 
@@ -135,6 +137,16 @@ void loop(void)
       sendStatus(sonar, AVAILABLE);
     }
     sonarState = reading;
+  }
+  
+  reading = readMagnetic();
+  if (reading != magneticState) {
+    if (reading == true) {
+      sendStatus(magnetic, OCCUPIED);
+    } else {
+      sendStatus(magnetic, AVAILABLE);
+    }
+    magneticState = reading;
   }
 
   delay(5000);
@@ -205,7 +217,7 @@ boolean readPhotocell() {
   }
   photocellReading /= 8;
   
-  if (photocellReading < 700) {
+  if (photocellReading > 700) {
     return true;
   } else {
     return false;
@@ -242,8 +254,7 @@ boolean readIR() {
 
 boolean readSonar() {
   int sonarPin = 2;
-  int sonarReading;
-  sonarReading = 0;
+  int sonarReading = 0;
   for (int i=0; i<8; i++) {
     sonarReading += analogRead(sonarPin);
     delay(50);
@@ -252,6 +263,19 @@ boolean readSonar() {
   sonarReading /= 2.54;
   
   if (sonarReading < 12) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+boolean readMagnetic() {
+  int magneticPin = 3;
+  int magneticReading = 0;
+
+  magneticReading = analogRead(magneticPin);
+  
+  if (magneticReading < 500) {
     return true;
   } else {
     return false;
