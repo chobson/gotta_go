@@ -10,6 +10,21 @@ class RestroomsController < ApplicationController
   # GET /restrooms/1
   # GET /restrooms/1.json
   def show
+    number_of_days = 6
+    data_table = GoogleVisualr::DataTable.new
+    data_table.new_column('string', 'Year')
+    data_table.new_column('number', 'Visits')
+    data_table.add_rows(number_of_days+1)
+    number_of_days.downto(0) do |i|
+      day = Time.now - i.days
+      column = number_of_days-i
+      activities = @restroom.activities.on_date(day)
+      data_table.set_cell(column, 0, day.strftime("%-m/%-d"))
+      data_table.set_cell(column, 1, activities.size)
+    end
+
+    opts = { :width => 800, :height => 480, :title => "#{@restroom.name} Daily Visits", :hAxis => { :title => 'Date', :titleTextStyle => {:color => 'red'}} }
+    @chart = GoogleVisualr::Interactive::ColumnChart.new(data_table, opts)
   end
 
   # GET /restrooms/new

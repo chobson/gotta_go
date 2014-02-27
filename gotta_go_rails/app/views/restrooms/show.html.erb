@@ -1,9 +1,2 @@
-<p id="notice"><%= notice %></p>
-
-<p>
-  <strong>Name:</strong>
-  <%= @restroom.name %>
-</p>
-
-<%= link_to 'Edit', edit_restroom_path(@restroom) %> |
-<%= link_to 'Back', restrooms_path %>
+<div id='chart'></div>
+<%= render_chart @chart, 'chart' %>

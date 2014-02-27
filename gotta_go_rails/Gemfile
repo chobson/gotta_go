@@ -48,7 +48,6 @@ end
 group :test, :darwin do
   gem 'rb-fsevent', :require => false
 end
-
 # Use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.1.2'
 
@@ -60,3 +59,5 @@ end
 
 # Use debugger
 # gem 'debugger', group: [:development, :test]
+
+gem "google_visualr"
